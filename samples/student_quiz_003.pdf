@@ -1,0 +1,45 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>
+endobj
+4 0 obj
+<< /Length 679 >>
+stream
+BT
+/F1 12 Tf
+50 760 Td
+(1. Explain the difference between capital expenditure and revenue expenditure. Provide one example of each.) Tj
+0 -18 Td
+(Capital expenditure is for long-term assets; revenue expenditure is for operating expenses.) Tj
+0 -18 Td
+(2. Describe the key steps in the GST input tax credit claim process for a registered business.) Tj
+0 -18 Td
+(Claim requires an invoice, eligible purchase, filing the GST return, and keeping records.) Tj
+0 -18 Td
+(3. Calculate depreciation for machinery purchased for ₹120,000 on 1 April using the straight-line method at 10% per annum for the first year.) Tj
+0 -18 Td
+(Depreciation = 120,000 × 10% = 12,000.) Tj
+0 -18 Td
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000241 00000 n 
+0000000970 00000 n 
+0000001040 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1040
+%%EOF

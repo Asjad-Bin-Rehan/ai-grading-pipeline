@@ -1,0 +1,22 @@
+# Secrets
+.env
+new.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+frontend/node_modules/
+frontend/dist/
+
+# Generated / local data
+backend/uploads/
+backend/results/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
