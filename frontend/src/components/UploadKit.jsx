@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../api';
 
 export function UploadKit({ onKitUploaded, loading }) {
   const [masterKeyFile, setMasterKeyFile] = useState(null);
@@ -32,7 +33,7 @@ export function UploadKit({ onKitUploaded, loading }) {
       formData.append('master_key', masterKeyFile);
       formData.append('rubric', rubricFile);
 
-      const response = await fetch('http://localhost:8000/upload-kit', {
+      const response = await fetch(apiUrl('/upload-kit'), {
         method: 'POST',
         body: formData,
       });

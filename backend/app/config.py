@@ -14,11 +14,21 @@ class Settings(BaseSettings):
     openai_api_key: str | None = Field(None, env='OPENAI_API_KEY')
     anthropic_api_key: str | None = Field(None, env='ANTHROPIC_API_KEY')
     groq_api_key: str | None = Field(None, env='GROQ_API_KEY')
+    gemini_api_key: str | None = Field(None, env='GEMINI_API_KEY')
+    gemini_model: str = Field('gemini-2.0-flash-001', env='GEMINI_MODEL')
     # Optional: specify a Groq model name and base URL via env
     groq_model: str | None = Field(None, env='GROQ_MODEL')
     groq_base_url: str = Field('https://api.groq.com', env='GROQ_BASE_URL')
+    cors_origins: str = Field(
+        'http://localhost:4173',
+        env='CORS_ORIGINS',
+        description='Comma-separated browser origins allowed to call the API',
+    )
     uploads_dir: Path = UPLOADS_DIR
     results_dir: Path = RESULTS_DIR
+
+    def cors_origins_list(self) -> list[str]:
+        return [origin.strip() for origin in self.cors_origins.split(',') if origin.strip()]
 
     class Config:
         # Load .env from the repository root (two levels up from this file)

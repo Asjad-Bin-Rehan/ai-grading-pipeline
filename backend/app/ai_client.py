@@ -16,6 +16,8 @@ class LLMClient:
             return self._call_anthropic(prompt)
         if self.provider == 'groq':
             return self._call_groq(prompt)
+        if self.provider == 'gemini':
+            return self._call_gemini(prompt)
         if self.provider in ('local', 'mock', 'demo'):
             return self._call_mock(prompt)
         raise ValueError('Unsupported model provider: ' + self.provider)
@@ -37,6 +39,11 @@ class LLMClient:
             'Content-Type': 'application/json',
         }
         response = self._client.post('https://api.openai.com/v1/chat/completions', json=payload, headers=headers)
+        if response.status_code == 429:
+            raise RuntimeError(
+                'OpenAI rate limit exceeded (429). Wait a few minutes, check billing at '
+                'platform.openai.com, or set MODEL_PROVIDER=mock in .env for testing.'
+            )
         response.raise_for_status()
         return response.json()['choices'][0]['message']['content']
 
@@ -92,6 +99,42 @@ class LLMClient:
             raise RuntimeError(f'Groq API request failed: {response.status_code} - {err_text}')
 
         return response.json()['choices'][0]['message']['content']
+
+    def _call_gemini(self, prompt: str) -> str:
+        if not settings.gemini_api_key:
+            raise RuntimeError('GEMINI_API_KEY is not configured')
+        model = settings.gemini_model
+        url = f'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent'
+        payload = {
+            'contents': [
+                {
+                    'role': 'user',
+                    'parts': [
+                        {
+                            'text': (
+                                'You are a deterministic grading assistant for academic quizzes. '
+                                'Respond with valid JSON only.\n\n' + prompt
+                            ),
+                        }
+                    ],
+                }
+            ],
+            'generationConfig': {
+                'temperature': 0,
+                'maxOutputTokens': 2000,
+            },
+        }
+        headers = {
+            'Content-Type': 'application/json',
+            'x-goog-api-key': settings.gemini_api_key,
+        }
+        response = self._client.post(url, json=payload, headers=headers)
+        if response.status_code != 200:
+            raise RuntimeError(
+                f'Gemini API request failed: {response.status_code} - {response.text}'
+            )
+        data = response.json()
+        return data['candidates'][0]['content']['parts'][0]['text']
 
     def _call_mock(self, prompt: str) -> str:
         """Mock grader for demo/testing without API keys."""

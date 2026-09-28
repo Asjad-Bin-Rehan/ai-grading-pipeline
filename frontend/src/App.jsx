@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { UploadKit } from './components/UploadKit';
 import { UploadStudentQuizzes } from './components/UploadStudentQuizzes';
+import { AgentGrading } from './components/AgentGrading';
+import { ChatAssistant } from './components/ChatAssistant';
 import { ResultsDashboard } from './components/ResultsDashboard';
 
 function App() {
@@ -19,6 +21,10 @@ function App() {
     }, 1000);
   };
 
+  const handleAgentComplete = () => {
+    setRefreshResults((prev) => prev + 1);
+  };
+
   return (
     <div className="app-shell">
       <header>
@@ -31,6 +37,10 @@ function App() {
       </header>
 
       <main className="main-content">
+        <AgentGrading onRunComplete={handleAgentComplete} />
+
+        <ChatAssistant />
+
         {/* Step 1: Upload Kit */}
         <UploadKit onKitUploaded={handleKitUploaded} loading={appLoading} />
 

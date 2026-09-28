@@ -65,11 +65,24 @@ header {
 
 /* Sections */
 .upload-section,
-.results-section {
+.results-section,
+.agent-section,
+.chat-section {
   background: white;
   border-radius: 8px;
   padding: 32px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.agent-report {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.agent-report h3 {
+  margin: 0 0 12px;
+  color: #111827;
 }
 
 .upload-section h2,
@@ -512,6 +525,85 @@ header {
   50% {
     opacity: 0.5;
   }
+}
+
+/* Chat assistant */
+.chat-window {
+  max-height: 360px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #f9fafb;
+}
+
+.chat-bubble {
+  margin-bottom: 12px;
+  padding: 12px 14px;
+  border-radius: 8px;
+  max-width: 90%;
+}
+
+.chat-bubble-user {
+  background: #dbeafe;
+  margin-left: auto;
+}
+
+.chat-bubble-assistant {
+  background: white;
+  border: 1px solid #e5e7eb;
+}
+
+.chat-role {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.chat-bubble p {
+  margin: 0;
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+
+.chat-typing {
+  font-style: italic;
+  color: #6b7280;
+}
+
+.chat-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.chat-suggestion-btn {
+  font-size: 0.85rem;
+  padding: 6px 12px;
+}
+
+.chat-form {
+  display: flex;
+  gap: 8px;
+}
+
+.chat-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.chat-input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
 }
 
 /* Footer */

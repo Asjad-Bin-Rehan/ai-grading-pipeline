@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 from uuid import uuid4
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -8,6 +8,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from .config import settings
+from .agent.chat_agent import run_chat
+from .agent.orchestrator import build_agent_report, submit_grading_workflow
+from .agent.schemas import AgentReportRequest, AgentRunReport, ChatRequest, ChatResponse
 from .extraction import save_uploaded_file
 from .tasks import grade_task
 
@@ -15,7 +18,7 @@ app = FastAPI(title='AI Grading Pipeline')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['http://localhost:4173'],
+    allow_origins=settings.cors_origins_list(),
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -89,6 +92,62 @@ def submit_batch_for_grading(
     return {'status': 'queued', 'tasks': queued_tasks}
 
 
+@app.post('/agent/run', response_model=AgentRunReport)
+def run_agent_grading_workflow(
+    master_key: UploadFile = File(...),
+    rubric: UploadFile = File(...),
+    submissions: List[UploadFile] = File(...),
+    student_ids: Optional[List[str]] = Form(None),
+):
+    if not submissions:
+        raise HTTPException(status_code=400, detail='At least one submission file is required')
+    if student_ids is not None and len(student_ids) != len(submissions):
+        raise HTTPException(
+            status_code=400,
+            detail='The number of student_ids must equal the number of submission files',
+        )
+
+    try:
+        return submit_grading_workflow(
+            master_key=master_key,
+            rubric=rubric,
+            submissions=submissions,
+            student_ids=student_ids,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@app.post('/agent/report', response_model=AgentRunReport)
+def get_agent_report(request: AgentReportRequest):
+    student_ids = [task.student_id for task in request.tasks]
+    if len(request.tasks) == 0:
+        raise HTTPException(status_code=400, detail='At least one task is required')
+
+    return build_agent_report(
+        run_id=request.run_id,
+        kit=request.kit,
+        tasks=request.tasks,
+        student_ids=student_ids,
+    )
+
+
+@app.post('/agent/chat', response_model=ChatResponse)
+def agent_chat(request: ChatRequest):
+    if not request.message.strip():
+        raise HTTPException(status_code=400, detail='Message cannot be empty')
+    try:
+        reply = run_chat(
+            message=request.message.strip(),
+            history=[item.model_dump() for item in request.history],
+        )
+        return ChatResponse(reply=reply)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(status_code=500, detail=f'Chat agent error: {exc}') from exc
+
+
 @app.get('/grade/status/{task_id}')
 def grade_status(task_id: str):
     async_result = grade_task.AsyncResult(task_id)
@@ -102,7 +161,11 @@ def grade_status(task_id: str):
 @app.get('/results')
 def list_results():
     files = sorted(settings.results_dir.glob('*.json'))
-    results = [json.loads(path.read_text(encoding='utf-8')) for path in files]
+    results = []
+    for path in files:
+        data = json.loads(path.read_text(encoding='utf-8'))
+        data['result_id'] = path.stem
+        results.append(data)
     return results
 
 

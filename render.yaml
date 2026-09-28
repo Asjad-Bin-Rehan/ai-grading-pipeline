@@ -1,0 +1,42 @@
+# Render Blueprint: API + Celery worker (deploy from repo root on render.com)
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  - type: web
+    name: ai-grading-api
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /docs
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: REDIS_URL
+        sync: false
+      - key: MODEL_PROVIDER
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+
+  - type: worker
+    name: ai-grading-worker
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A backend.app.tasks worker --loglevel=info --concurrency=2
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.12.0"
+      - key: REDIS_URL
+        sync: false
+      - key: MODEL_PROVIDER
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false

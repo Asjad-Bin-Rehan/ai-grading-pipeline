@@ -16,10 +16,11 @@ services:
       - '8000:8000'
     environment:
       - REDIS_URL=redis://redis:6379/0
-      - MODEL_PROVIDER=openai
+      - MODEL_PROVIDER=${MODEL_PROVIDER:-openai}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - redis
   worker:
@@ -32,9 +33,10 @@ services:
     working_dir: /workspace
     environment:
       - REDIS_URL=redis://redis:6379/0
-      - MODEL_PROVIDER=openai
+      - MODEL_PROVIDER=${MODEL_PROVIDER:-openai}
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
       - GROQ_API_KEY=${GROQ_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     depends_on:
       - redis

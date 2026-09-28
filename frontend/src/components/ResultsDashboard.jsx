@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { apiUrl } from '../api';
 
 export function ResultsDashboard({ refreshTrigger }) {
   const [results, setResults] = useState([]);
@@ -15,7 +16,7 @@ export function ResultsDashboard({ refreshTrigger }) {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch('http://localhost:8000/results');
+      const response = await fetch(apiUrl('/results'));
       if (!response.ok) {
         throw new Error('Failed to fetch results');
       }
@@ -109,8 +110,10 @@ export function ResultsDashboard({ refreshTrigger }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredResults.map((result) => (
-                    <React.Fragment key={result.student_id}>
+                  {filteredResults.map((result, index) => {
+                    const rowKey = result.result_id || `${result.student_id}-${index}`;
+                    return (
+                    <React.Fragment key={rowKey}>
                       <tr className={result.needs_human_review ? 'flagged' : ''}>
                         <td className="student-id">{result.student_id}</td>
                         <td className="score">
@@ -128,23 +131,23 @@ export function ResultsDashboard({ refreshTrigger }) {
                             className="btn-expand"
                             onClick={() =>
                               setExpandedStudent(
-                                expandedStudent === result.student_id
+                                expandedStudent === rowKey
                                   ? null
-                                  : result.student_id
+                                  : rowKey
                               )
                             }
                           >
-                            {expandedStudent === result.student_id ? '▼' : '▶'}
+                            {expandedStudent === rowKey ? '▼' : '▶'}
                           </button>
                         </td>
                       </tr>
-                      {expandedStudent === result.student_id && (
+                      {expandedStudent === rowKey && (
                         <tr className="details-row">
                           <td colSpan="4">
                             <div className="details-content">
                               <h5>Question Evaluations</h5>
                               {result.question_evaluations.map((q, idx) => (
-                                <div key={idx} className="question-detail">
+                                <div key={`${rowKey}-q-${q.question_number}-${idx}`} className="question-detail">
                                   <div className="question-header">
                                     <strong>Question {q.question_number}</strong>
                                     <span className="points">
@@ -161,7 +164,8 @@ export function ResultsDashboard({ refreshTrigger }) {
                         </tr>
                       )}
                     </React.Fragment>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

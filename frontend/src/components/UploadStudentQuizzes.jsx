@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { apiUrl } from '../api';
 
 export function UploadStudentQuizzes({ kitData, onGradingStarted, loading }) {
   const [quizFiles, setQuizFiles] = useState([]);
@@ -45,7 +46,7 @@ export function UploadStudentQuizzes({ kitData, onGradingStarted, loading }) {
         formData.append('master_key_path', kitData.master_key_path);
         formData.append('rubric_path', kitData.rubric_path);
 
-        const response = await fetch('http://localhost:8000/grade/submit', {
+        const response = await fetch(apiUrl('/grade/submit'), {
           method: 'POST',
           body: formData,
         });

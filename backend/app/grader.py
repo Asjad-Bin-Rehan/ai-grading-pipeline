@@ -80,9 +80,7 @@ def grade_submission(student_id: str, submission_file: Path, master_key_file: Pa
     llm = get_llm_client()
     raw_response = llm.grade(prompt)
     parsed = parse_json_response(raw_response)
-
-    if str(parsed.get('student_id')).strip() == '':
-        parsed['student_id'] = student_id
+    parsed['student_id'] = student_id
 
     return normalize_grade_payload(parsed)
 
